@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vogo/screens/HomeScreen/View/bottombar.dart';
 import 'package:vogo/screens/Singin/view/Register.dart';
 import 'package:vogo/screens/Singin/view/SinginPage.dart';
+import 'package:vogo/screens/Singup/view/SingupPage.dart';
 
 // Splash Screen 1
 class SplashScreen1 extends StatefulWidget {
@@ -108,7 +109,7 @@ class SplashScreen2 extends StatelessWidget {
                             Navigator.push(
                               context,
                               CupertinoPageRoute(
-                                builder: (context) => RegisterScreen(),
+                                builder: (context) => SignUpScreen(),
                               ),
                             );
                           },
