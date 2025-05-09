@@ -18,22 +18,21 @@ class ProfileScreen extends StatelessWidget {
       builder:
           (context, child) => Scaffold(
             backgroundColor: Colors.white,
-            body: Column(
-              children: [
-                SizedBox(height: 60.h),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 30.r,
-                        backgroundImage: AssetImage(
-                          'assets/images/profile.jpg',
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(height: 60.h),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 30.r,
+                          
+                          
                         ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: Column(
+                        SizedBox(width: 12.w),
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
@@ -62,65 +61,65 @@ class ProfileScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 30.h),
-                Divider(thickness: 1, color: Colors.grey.shade300),
-                ...[
-                  _buildTile(Icons.shopping_bag_outlined, "Orders"),
-                  _buildTile(Icons.perm_identity, "My Details"),
-                  _buildTile(Icons.location_on_outlined, "Delivery Address"),
-                  _buildTile(Icons.credit_card_outlined, "Payment Methods"),
-                  _buildTile(Icons.confirmation_num_outlined, "Promo Cord"),
-                  _buildTile(Icons.notifications_none, "Notifications"),
-                  _buildTile(Icons.help_outline, "Help"),
-                  _buildTile(Icons.info_outline, "About"),
-                ],
-                Spacer(),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  child: Container(
-                    height: 56.h,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12.r),
+                      ],
                     ),
-                    child: TextButton.icon(
-                      onPressed: () async {
-                        // Log out logic here
-                        Fluttertoast.showToast(
-                          msg: "Logged out successfully",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.TOP,
-                          backgroundColor: Colors.red,
-                          textColor: Colors.white,
-                          fontSize: 12.0,
-                        );
-                        await box.clear();
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => SplashScreen1(),
+                  ),
+                  SizedBox(height: 30.h),
+                  Divider(thickness: 1, color: Colors.grey.shade300),
+                  ...[
+                    _buildTile(Icons.shopping_bag_outlined, "Orders"),
+                    _buildTile(Icons.perm_identity, "My Details"),
+                    _buildTile(Icons.location_on_outlined, "Delivery Address"),
+                    _buildTile(Icons.credit_card_outlined, "Payment Methods"),
+                    _buildTile(Icons.confirmation_num_outlined, "Promo Cord"),
+                    _buildTile(Icons.notifications_none, "Notifications"),
+                    _buildTile(Icons.help_outline, "Help"),
+                    _buildTile(Icons.info_outline, "About"),
+                  ],
+                  SizedBox(height: 16.h),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: Container(
+                      height: 56.h,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: TextButton.icon(
+                        onPressed: () async {
+                          // Log out logic here
+                          Fluttertoast.showToast(
+                            msg: "Logged out successfully",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.TOP,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 12.0,
+                          );
+                          await box.clear();
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => SplashScreen1(),
+                            ),
+                            (route) => false,
+                          );
+                        },
+                        icon: Icon(Icons.logout, color: Colors.green),
+                        label: Text(
+                          "Log Out",
+                          style: GoogleFonts.abel(
+                            color: Colors.green,
+                            fontSize: 16.sp,
                           ),
-                          (route) => false,
-                        );
-                      },
-                      icon: Icon(Icons.logout, color: Colors.green),
-                      label: Text(
-                        "Log Out",
-                        style: GoogleFonts.abel(
-                          color: Colors.green,
-                          fontSize: 16.sp,
                         ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: 16.h),
-              ],
+                  SizedBox(height: 16.h),
+                ],
+              ),
             ),
           ),
     );
