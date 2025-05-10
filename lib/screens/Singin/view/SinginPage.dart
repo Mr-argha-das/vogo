@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vogo/core/auth/login.auth.dart';
+import 'package:vogo/screens/Forgot/forgotScreen.dart';
 import 'package:vogo/screens/HomeScreen/View/bottombar.dart';
 import 'package:vogo/screens/Singup/view/SingupPage.dart';
 
@@ -131,7 +132,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => ForgotScreen(),
+                          ),
+                        );
+                      },
                       child: Text(
                         'Forgot Password?',
                         style: GoogleFonts.abel(
