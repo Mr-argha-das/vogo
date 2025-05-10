@@ -113,11 +113,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                       CupertinoPageRoute(
                                         builder:
                                             (context) => Search_Page(
-                                              categoryName:
-                                                  category
-                                                      .catalogVisibility
-                                                      ?.name ??
-                                                  "",
+                                              categoryName: category.name ?? "",
                                             ),
                                       ),
                                     );
@@ -155,7 +151,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                         ),
                                         const SizedBox(height: 8),
                                         Text(
-                                          category.catalogVisibility?.name ??
+                                          category.name ??
                                               "No name",
                                           textAlign: TextAlign.center,
                                           style: const TextStyle(

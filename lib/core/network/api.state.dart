@@ -17,7 +17,7 @@ abstract class APIStateNetwork {
   @POST('/vogofamily/login')
   Future<HttpResponse<LoginResponse>> login(@Body() LoginBody body);
   @POST('/vogofamily/SignUp')
-  Future<HttpResponse<RegisterResponse>> register(@Body() RegisterRequest body);
+  Future<HttpResponse> register(@Body() RegisterRequest body);
   @GET('/wc/v3/products/categories')
   Future<HttpResponse<List<CategoryResponse>>> getCategory();
   @GET('/wc/v3/products')

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:vogo/screens/Singin/view/Bynumber.dart';
+import 'package:vogo/screens/Singup/view/SingupPage.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -126,30 +127,40 @@ class RegisterScreen extends StatelessWidget {
               //   color: const Color(0xFF3b5998),
               // ),
               SizedBox(height: 16.h),
-              Container(
-                height: 67.h,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: const Color.fromARGB(255, 83, 117, 117),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: 24.h,
-                      width: 24.w,
-                      child: Image.asset('assets/Images/icons8-gmail-480.png'),
+              GestureDetector(
+                onTap: (){
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => SignUpScreen(),
                     ),
-                    SizedBox(width: 10.w),
-                    Text(
-                      "Continue with mail",
-                      style: GoogleFonts.abel(
-                        fontSize: 18,
-                        color: Colors.white,
+                  );
+                },
+                child: Container(
+                  height: 67.h,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: const Color.fromARGB(255, 83, 117, 117),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 24.h,
+                        width: 24.w,
+                        child: Image.asset('assets/Images/icons8-gmail-480.png'),
                       ),
-                    ),
-                  ],
+                      SizedBox(width: 10.w),
+                      Text(
+                        "Continue with mail",
+                        style: GoogleFonts.abel(
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               // // Email Button

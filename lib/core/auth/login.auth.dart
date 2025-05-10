@@ -8,6 +8,7 @@ import 'package:vogo/core/network/api.state.dart';
 import 'package:vogo/core/utils/preety.dio.dart';
 import 'package:vogo/data/models/login.body.dart';
 import 'package:vogo/data/models/register.req.model.dart';
+import 'package:vogo/data/models/register.response.dart';
 
 import 'package:vogo/screens/HomeScreen/View/bottombar.dart';
 
@@ -75,24 +76,27 @@ class Auth {
   static Future<void> register(
     String email,
     String password,
+    String referralCode,
     BuildContext context,
   ) async {
+    final dio = await createDio();
+    final service = APIStateNetwork(dio);
+    final response = await service.register(
+      RegisterRequest(
+        email: email,
+        password: password,
+        referralCode: referralCode,
+      ),
+    );
     try {
-      final dio = await createDio();
-      final service = APIStateNetwork(dio);
-      final response = await service.register(
-        RegisterRequest(
-          email: email,
-          password: password,
-          referralCode: "testing",
-        ),
-      );
-
       if (response.response.data['status'] == true) {
         final box = await Hive.openBox('userdata');
-        await box.put('name', response.data.data.userName);
-        await box.put('@id', response.data.data.userId);
-        await box.put('email', response.data.data.email);
+        RegisterResponse data = RegisterResponse.fromJson(
+          response.response.data,
+        );
+        await box.put('name', data.data.userName);
+        await box.put('@id', data.data.userId);
+        await box.put('email', data.data.email);
         Fluttertoast.showToast(
           msg: response.response.data['message'],
           toastLength: Toast.LENGTH_SHORT,
@@ -120,7 +124,7 @@ class Auth {
       }
     } catch (e) {
       Fluttertoast.showToast(
-        msg: 'Something went wrong',
+        msg: response.response.data['message'],
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.TOP,
         backgroundColor: Colors.red,

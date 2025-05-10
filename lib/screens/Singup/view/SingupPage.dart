@@ -20,6 +20,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _frormKey = GlobalKey<FormState>();
   bool isPasswordVisible = false;
   bool _bottonLoder = false;
+  final TextEditingController referralCodeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +98,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     },
                   ),
                   SizedBox(height: 20.h),
-
+                  TextFormField(
+                    controller: referralCodeController,
+                    decoration: InputDecoration(
+                      labelText: 'Referral Code',
+                      labelStyle: GoogleFonts.abel(fontSize: 16.sp),
+                      border: UnderlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your username';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 20.h),
                   // Password
                   TextFormField(
                     controller: passwordController,
@@ -176,6 +191,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             await Auth.register(
                               emailController.text,
                               passwordController.text,
+                              referralCodeController.text,
                               context,
                             );
                           } catch (e) {
