@@ -23,17 +23,17 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Form(
-              key: _formKey,
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 32.h),
-
+                  
                   // Decorative V logo
                   Center(
                     child: Image.asset(
@@ -42,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   SizedBox(height: 32.h),
-
+              
                   Text(
                     'Conectare la VOGO',
                     style: GoogleFonts.abel(
@@ -53,20 +53,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(height: 6.h),
                   Text(
                     'Enter your emails and password',
-                    style: GoogleFonts.abel(
-                      fontSize: 16.sp,
-                      color: Colors.grey,
-                    ),
+                    style: GoogleFonts.abel(fontSize: 16.sp, color: Colors.grey),
                   ),
                   SizedBox(height: 36.h),
-
+              
                   // Email Field
                   Text(
                     'Email',
-                    style: GoogleFonts.abel(
-                      fontSize: 16.sp,
-                      color: Colors.grey,
-                    ),
+                    style: GoogleFonts.abel(fontSize: 16.sp, color: Colors.grey),
                   ),
                   SizedBox(height: 6.h),
                   TextFormField(
@@ -87,14 +81,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   SizedBox(height: 24.h),
-
+              
                   // Password Field
                   Text(
                     'Password',
-                    style: GoogleFonts.abel(
-                      fontSize: 16.sp,
-                      color: Colors.grey,
-                    ),
+                    style: GoogleFonts.abel(fontSize: 16.sp, color: Colors.grey),
                   ),
                   SizedBox(height: 6.h),
                   TextFormField(
@@ -127,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   SizedBox(height: 10.h),
-
+              
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -142,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   SizedBox(height: 16.h),
-
+              
                   // Log In Button
                   SizedBox(
                     width: double.infinity,
@@ -192,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   SizedBox(height: 20.h),
-
+              
                   // Register text
                   Center(
                     child: GestureDetector(
@@ -224,6 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
+                  SizedBox(height: 400.h),
                 ],
               ),
             ),

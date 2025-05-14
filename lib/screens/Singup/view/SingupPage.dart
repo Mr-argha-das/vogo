@@ -58,23 +58,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       color: Colors.grey,
                     ),
                   ),
-                  SizedBox(height: 30.h),
+                  // SizedBox(height: 30.h),
 
-                  // Username
-                  TextFormField(
-                    controller: usernameController,
-                    decoration: InputDecoration(
-                      labelText: 'Username',
-                      labelStyle: GoogleFonts.abel(fontSize: 16.sp),
-                      border: UnderlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your username';
-                      }
-                      return null;
-                    },
-                  ),
+                  // // Username
+                  // TextFormField(
+                  //   controller: usernameController,
+                  //   decoration: InputDecoration(
+                  //     labelText: 'Username',
+                  //     labelStyle: GoogleFonts.abel(fontSize: 16.sp),
+                  //     border: UnderlineInputBorder(),
+                  //   ),
+                  //   validator: (value) {
+                  //     if (value == null || value.isEmpty) {
+                  //       return 'Please enter your username';
+                  //     }
+                  //     return null;
+                  //   },
+                  // ),
                   SizedBox(height: 20.h),
 
                   // Email
@@ -97,21 +97,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 20.h),
-                  TextFormField(
-                    controller: referralCodeController,
-                    decoration: InputDecoration(
-                      labelText: 'Referral Code',
-                      labelStyle: GoogleFonts.abel(fontSize: 16.sp),
-                      border: UnderlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your username';
-                      }
-                      return null;
-                    },
-                  ),
+                  // SizedBox(height: 20.h),
+                  // TextFormField(
+                  //   controller: referralCodeController,
+                  //   decoration: InputDecoration(
+                  //     labelText: 'Referral Code',
+                  //     labelStyle: GoogleFonts.abel(fontSize: 16.sp),
+                  //     border: UnderlineInputBorder(),
+                  //   ),
+                  //   validator: (value) {
+                  //     if (value == null || value.isEmpty) {
+                  //       return 'Please enter your username';
+                  //     }
+                  //     return null;
+                  //   },
+                  // ),
                   SizedBox(height: 20.h),
                   // Password
                   TextFormField(
@@ -191,7 +191,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             await Auth.register(
                               emailController.text,
                               passwordController.text,
-                              referralCodeController.text,
+                            
                               context,
                             );
                           } catch (e) {

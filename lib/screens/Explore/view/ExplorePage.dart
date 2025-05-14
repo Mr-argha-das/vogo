@@ -3,7 +3,8 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:vogo/data/providers/products.provider.dart';
+import 'package:vogo/core/network/http.api.service.dart';
+import 'package:vogo/data/providers/categorys.provider.dart';
 import 'package:vogo/screens/Search/View/SearchPage.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
@@ -23,7 +24,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final productService = ref.watch(productProvider);
+    final productService = ref.watch(categorsysProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -32,8 +33,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
           // Filter the list based on search query
           final filteredCategories =
               snapshot.where((category) {
-                final name =
-                    category.catalogVisibility?.name?.toLowerCase() ?? '';
+                final name = category.name?.toLowerCase() ?? '';
                 return name.contains(_searchQuery.toLowerCase());
               }).toList();
 
@@ -112,8 +112,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                       context,
                                       CupertinoPageRoute(
                                         builder:
-                                            (context) => Search_Page(
+                                            (context) => SearchPage(
                                               categoryName: category.name ?? "",
+                                              categoryId: category.id ?? 0,
                                             ),
                                       ),
                                     );
@@ -141,18 +142,19 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                                   BorderRadius.circular(20),
                                               image: DecorationImage(
                                                 image: NetworkImage(
-                                                  category.images![0].src ??
+                                                  category.image?.src ??
                                                       "https://placehold.co/600x400/000000/FFFFFF/png",
                                                 ),
-                                                fit: BoxFit.contain,
+                                                fit: BoxFit.fill,
                                               ),
                                             ),
                                           ),
                                         ),
                                         const SizedBox(height: 8),
                                         Text(
-                                          category.name ??
-                                              "No name",
+                                          truncateString(
+                                            category.name ?? "No name",
+                                          ),
                                           textAlign: TextAlign.center,
                                           style: const TextStyle(
                                             fontSize: 14,
@@ -202,4 +204,11 @@ Color generateSoftColor() {
 
   final Random random = Random();
   return softColors[random.nextInt(softColors.length)];
+}
+
+String truncateString(String input, {int maxLength = 15}) {
+  if (input.length <= maxLength) {
+    return input;
+  }
+  return '${input.substring(0, maxLength)}';
 }

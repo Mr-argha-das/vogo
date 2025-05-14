@@ -76,7 +76,7 @@ class Auth {
   static Future<void> register(
     String email,
     String password,
-    String referralCode,
+
     BuildContext context,
   ) async {
     final dio = await createDio();
@@ -85,7 +85,7 @@ class Auth {
       RegisterRequest(
         email: email,
         password: password,
-        referralCode: referralCode,
+        referralCode: "testing",
       ),
     );
     try {

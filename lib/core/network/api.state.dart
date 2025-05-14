@@ -5,6 +5,7 @@ import 'package:vogo/data/models/category.model.dart';
 import 'package:vogo/data/models/login.body.dart';
 import 'package:vogo/data/models/login.response.dart';
 import 'package:vogo/data/models/product.model.dart';
+import 'package:vogo/data/models/pruduts.byCategorymodel.dart';
 import 'package:vogo/data/models/register.req.model.dart';
 import 'package:vogo/data/models/register.response.dart';
 
@@ -21,4 +22,11 @@ abstract class APIStateNetwork {
   Future<HttpResponse<List<CategoryResponse>>> getCategory();
   @GET('/wc/v3/products')
   Future<HttpResponse<List<ProductListResponse>>> getProduct();
+  @GET("/wc/v3/products")
+  Future<List<ProductsByCategoryModel>> getProductsByCategory(
+    @Query("categories") int categoryId,
+    @Query("per_page") int perPage,
+    @Query("page") int page,
+    @Query("search") String? searchQuery, // Optional search parameter
+  );
 }
