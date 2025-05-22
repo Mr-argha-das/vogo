@@ -21,13 +21,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
+  String truncateString(String value, {int maxLength = 13}) {
+    return (value.length <= maxLength)
+        ? value
+        : '${value.substring(0, maxLength)}...';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final categoryResponse = ref.watch(categorsysProvider);
+    final categoryResponse = ref.watch(categoryListProvider);
+    final categoryNotifier = ref.read(categoryListProvider.notifier);
 
     return categoryResponse.when(
       data: (snapshot) {
-        // 🔍 Filter categories by search query
         final filteredList =
             snapshot.where((item) {
               final name = item.name?.toLowerCase() ?? '';
@@ -80,7 +86,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                 ),
-
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -125,7 +130,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         ),
                         const SizedBox(height: 12),
-
                         filteredList.isEmpty
                             ? const Padding(
                               padding: EdgeInsets.only(top: 24),
@@ -136,46 +140,89 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 ),
                               ),
                             )
-                            : GridView.builder(
-                              itemCount: filteredList.length,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    childAspectRatio: 0.85,
-                                    crossAxisSpacing: 12.w,
-                                    mainAxisSpacing: 12.h,
-                                  ),
-                              itemBuilder: (context, index) {
-                                final item = filteredList[index];
-                                return Column(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      child: Image.network(
-                                        item.image?.src ??
-                                            "https://placehold.co/600x400/000000/FFFFFF/png",
-                                        height: 100.h,
-                                        width: double.infinity,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    SizedBox(height: 6.h),
-                                    Text(
-                                      item.name ?? "No name",
-                                      textAlign: TextAlign.center,
-                                      style: GoogleFonts.abel(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.green[900],
-                                      ),
-                                    ),
-                                  ],
-                                );
+                            : NotificationListener<ScrollNotification>(
+                              onNotification: (scrollInfo) {
+                                if (!categoryNotifier.isFetching &&
+                                    categoryNotifier.hasMore &&
+                                    scrollInfo.metrics.pixels >=
+                                        scrollInfo.metrics.maxScrollExtent -
+                                            300) {
+                                  categoryNotifier.fetchNextPage();
+                                }
+                                return false;
                               },
+                              child: GridView.builder(
+                                itemCount:
+                                    filteredList.length +
+                                    (categoryNotifier.hasMore ? 1 : 0),
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      childAspectRatio: 1,
+                                      crossAxisSpacing: 12.w,
+                                      mainAxisSpacing: 12.h,
+                                    ),
+                                itemBuilder: (context, index) {
+                                  if (index < filteredList.length) {
+                                    final item = filteredList[index];
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        borderRadius: BorderRadius.circular(
+                                          12.r,
+                                        ),
+                                        border: Border.all(
+                                          color: Colors.grey[300]!,
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Expanded(
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.transparent,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                image: DecorationImage(
+                                                  image: NetworkImage(
+                                                    item.image ??
+                                                        "https://placehold.co/600x400/000000/FFFFFF/png",
+                                                  ),
+                                                  fit: BoxFit.fill,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: 6.h),
+                                          Text(
+                                            truncateString(
+                                              item.name ?? "No name",
+                                            ),
+                                            textAlign: TextAlign.center,
+                                            style: GoogleFonts.abel(
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.green[900],
+                                            ),
+                                          ),
+                                          SizedBox(height: 3.h),
+                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    return const Padding(
+                                      padding: EdgeInsets.all(16),
+                                      child: Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
                             ),
-
                         const SizedBox(height: 20),
                       ],
                     ),
@@ -186,19 +233,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         );
       },
-      error: (err, stack) {
-        return Center(
-          child: Text(
-            'Error: $err',
-            style: GoogleFonts.abel(fontSize: 16.sp, color: Colors.red),
+      error:
+          (err, stack) => Center(
+            child: Text(
+              'Error: $err',
+              style: GoogleFonts.abel(fontSize: 16.sp, color: Colors.red),
+            ),
           ),
-        );
-      },
-      loading: () {
-        return Center(
-          child: CircularProgressIndicator(color: Colors.green[800]),
-        );
-      },
+      loading:
+          () => Center(
+            child: CircularProgressIndicator(color: Colors.green[800]),
+          ),
     );
   }
 }

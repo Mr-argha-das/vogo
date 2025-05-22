@@ -5,11 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vogo/core/network/http.api.service.dart';
 import 'package:vogo/data/models/pruduts.byCategorymodel.dart' as model;
 import 'package:vogo/screens/Filter/View/FilterPage.dart';
+import 'package:vogo/screens/productDetails/view/ProductDetailsPage.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   final String categoryName;
   final int categoryId;
-
   const SearchPage({
     Key? key,
     required this.categoryName,
@@ -146,7 +146,16 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                               }
                               final product = products[index];
                               return GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (context) => ProductDetailScreen(
+                                        productId: product.id.toString(),
+                                      ),
+                                    ),
+                                  );
+                                },
                                 child: Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(16),
@@ -173,7 +182,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                           child:
                                               product.images!.isNotEmpty
                                                   ? Image.network(
-                                                    product.images?.first.src ?? "" ,
+                                                    product.images?.first.src ??
+                                                        "",
                                                     fit: BoxFit.contain,
                                                     errorBuilder: (
                                                       context,

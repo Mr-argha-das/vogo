@@ -145,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           setState(() {
                             _bottonLoder = true;
                           });
-                          // Simulate a network call
+                          // Simulate a network call 
                           try {
                             await Auth.login(
                               emailController.text,

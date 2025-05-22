@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:vogo/core/network/http.api.service.dart';
 import 'package:vogo/data/providers/categorys.provider.dart';
 import 'package:vogo/screens/Search/View/SearchPage.dart';
 
@@ -24,15 +23,15 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final productService = ref.watch(categorsysProvider);
+    final categoryResponse = ref.watch(categoryListProvider);
+    final categoryNotifier = ref.read(categoryListProvider.notifier);
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: productService.when(
-        data: (snapshot) {
-          // Filter the list based on search query
+      body: categoryResponse.when(
+        data: (categories) {
           final filteredCategories =
-              snapshot.where((category) {
+              categories.where((category) {
                 final name = category.name?.toLowerCase() ?? '';
                 return name.contains(_searchQuery.toLowerCase());
               }).toList();
@@ -47,7 +46,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     child: Text(
                       "Find premium services and products",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
                       ),
@@ -95,77 +94,102 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                 style: TextStyle(fontSize: 16),
                               ),
                             )
-                            : GridView.builder(
-                              itemCount: filteredCategories.length,
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 12,
-                                    mainAxisSpacing: 16,
-                                    childAspectRatio: 0.9,
-                                  ),
-                              itemBuilder: (context, index) {
-                                final category = filteredCategories[index];
-                                return GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      CupertinoPageRoute(
-                                        builder:
-                                            (context) => SearchPage(
-                                              categoryName: category.name ?? "",
-                                              categoryId: category.id ?? 0,
-                                            ),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: generateSoftColor(),
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: generateSoftColor().withOpacity(
-                                          0.5,
-                                        ),
-                                      ),
+                            : NotificationListener<ScrollNotification>(
+                              onNotification: (ScrollNotification scrollInfo) {
+                                if (!categoryNotifier.isFetching &&
+                                    categoryNotifier.hasMore &&
+                                    scrollInfo.metrics.pixels >=
+                                        scrollInfo.metrics.maxScrollExtent -
+                                            300) {
+                                  categoryNotifier.fetchNextPage();
+                                }
+                                return false;
+                              },
+                              child: GridView.builder(
+                                itemCount:
+                                    filteredCategories.length +
+                                    (categoryNotifier.hasMore ? 1 : 0),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 12,
+                                      mainAxisSpacing: 16,
+                                      childAspectRatio: 0.9,
                                     ),
-                                    padding: const EdgeInsets.all(12),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Expanded(
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.transparent,
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                              image: DecorationImage(
-                                                image: NetworkImage(
-                                                  category.image?.src ??
-                                                      "https://placehold.co/600x400/000000/FFFFFF/png",
+                                itemBuilder: (context, index) {
+                                  if (index < filteredCategories.length) {
+                                    final category = filteredCategories[index];
+                                    return GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                            builder:
+                                                (context) => SearchPage(
+                                                  categoryName:
+                                                      category.name ?? "",
+                                                  categoryId: category.id ?? 0,
                                                 ),
-                                                fit: BoxFit.fill,
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: generateSoftColor(),
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                          border: Border.all(
+                                            color: generateSoftColor()
+                                                .withOpacity(0.5),
+                                          ),
+                                        ),
+                                        padding: const EdgeInsets.all(12),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.transparent,
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                  image: DecorationImage(
+                                                    image: NetworkImage(
+                                                      category.image ??
+                                                          "https://placehold.co/600x400/000000/FFFFFF/png",
+                                                    ),
+                                                    fit: BoxFit.fill,
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                          ),
+                                            SizedBox(height: 8),
+                                            Text(
+                                              truncateString(
+                                                category.name ?? "No name",
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          truncateString(
-                                            category.name ?? "No name",
-                                          ),
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
+                                      ),
+                                    );
+                                  } else {
+                                    return const Padding(
+                                      padding: EdgeInsets.all(16),
+                                      child: Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
                             ),
                   ),
                 ],
@@ -207,8 +231,6 @@ Color generateSoftColor() {
 }
 
 String truncateString(String input, {int maxLength = 15}) {
-  if (input.length <= maxLength) {
-    return input;
-  }
-  return '${input.substring(0, maxLength)}';
+  if (input.length <= maxLength) return input;
+  return '${input.substring(0, maxLength)}...';
 }
