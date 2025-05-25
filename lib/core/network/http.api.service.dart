@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:vogo/core/auth/oauth1_interceptor.dart';
 import 'package:vogo/core/utils/preety.dio.dart';
 import 'package:vogo/data/models/pruduts.byCategorymodel.dart';
@@ -29,7 +31,7 @@ class ApiService {
     final response = await dio.get(
       'https://vogo.family/wp-json/wc/v3/products',
       queryParameters: {
-        'categories': categoryId,
+        'category': categoryId,
         'per_page': perPage,
         'page': page,
         if (searchQuery != null && searchQuery.isNotEmpty)
@@ -83,6 +85,10 @@ class ProductsNotifier extends StateNotifier<List<ProductsByCategoryModel>> {
     loadInitial(); // Reload the products based on new search query
   }
 
+  void clearData(){
+    state = [];
+  }
+
   Future<void> loadInitial() async {
     _currentPage = 1;
     _hasMore = true;
@@ -100,6 +106,17 @@ class ProductsNotifier extends StateNotifier<List<ProductsByCategoryModel>> {
       page: _currentPage,
       searchQuery: _searchQuery, // Pass the search query to the API
     );
+    if (newProducts.isEmpty) {
+      Fluttertoast.showToast(
+        msg: "No more products available",
+        toastLength: Toast.LENGTH_SHORT,
+        backgroundColor: Colors.green
+      );
+      _hasMore = false;
+    } else {
+      state = [...state, ...newProducts];
+      _currentPage++;
+    }
 
     if (newProducts.isEmpty) {
       _hasMore = false;

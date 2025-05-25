@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vogo/data/providers/categorys.provider.dart';
+import 'package:vogo/screens/Search/View/SearchPage.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -167,49 +169,65 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 itemBuilder: (context, index) {
                                   if (index < filteredList.length) {
                                     final item = filteredList[index];
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[200],
-                                        borderRadius: BorderRadius.circular(
-                                          12.r,
+                                    return GestureDetector(
+                                      onTap: () {
+                                        // Handle item tap
+                                        Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                            builder:
+                                                (context) => SearchPage(
+                                                  categoryName:
+                                                      item.name ?? "",
+                                                  categoryId: item.id ?? 0,
+                                                ),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[200],
+                                          borderRadius: BorderRadius.circular(
+                                            12.r,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.grey[300]!,
+                                            width: 1,
+                                          ),
                                         ),
-                                        border: Border.all(
-                                          color: Colors.grey[300]!,
-                                          width: 1,
-                                        ),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Expanded(
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: Colors.transparent,
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                image: DecorationImage(
-                                                  image: NetworkImage(
-                                                    item.image ??
-                                                        "https://placehold.co/600x400/000000/FFFFFF/png",
+                                        child: Column(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.transparent,
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                  image: DecorationImage(
+                                                    image: NetworkImage(
+                                                      item.image ??
+                                                          "https://placehold.co/600x400/000000/FFFFFF/png",
+                                                    ),
+                                                    fit: BoxFit.fill,
                                                   ),
-                                                  fit: BoxFit.fill,
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          SizedBox(height: 6.h),
-                                          Text(
-                                            truncateString(
-                                              item.name ?? "No name",
+                                            SizedBox(height: 6.h),
+                                            Text(
+                                              truncateString(
+                                                item.name ?? "No name",
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              style: GoogleFonts.abel(
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.green[900],
+                                              ),
                                             ),
-                                            textAlign: TextAlign.center,
-                                            style: GoogleFonts.abel(
-                                              fontSize: 14.sp,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.green[900],
-                                            ),
-                                          ),
-                                          SizedBox(height: 3.h),
-                                        ],
+                                            SizedBox(height: 3.h),
+                                          ],
+                                        ),
                                       ),
                                     );
                                   } else {

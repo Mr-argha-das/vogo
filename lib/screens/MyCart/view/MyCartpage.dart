@@ -1,7 +1,19 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart' show CupertinoPageRoute;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart' show Hive;
+import 'package:vogo/core/network/api.state.dart';
+import 'package:vogo/core/utils/preety.dio.dart';
+import 'package:vogo/data/providers/cartList.provider.dart';
+import 'package:vogo/data/models/cartsList.model.dart';
+import 'package:vogo/data/models/remove.cart.model.dart';
+import 'package:vogo/data/models/update.cartmodel.dart';
+import 'package:vogo/screens/Explore/view/ExplorePage.dart';
 
 class CartItem {
   final String name;
@@ -19,14 +31,14 @@ class CartItem {
   });
 }
 
-class CartScreen extends StatefulWidget {
+class CartScreen extends ConsumerStatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
 
   @override
-  State<CartScreen> createState() => _CartScreenState();
+  ConsumerState<CartScreen> createState() => _CartScreenState();
 }
 
-class _CartScreenState extends State<CartScreen> {
+class _CartScreenState extends ConsumerState<CartScreen> {
   List<CartItem> cartItems = [
     CartItem(
       name: "Bell Pepper Red",
@@ -76,9 +88,16 @@ class _CartScreenState extends State<CartScreen> {
 
   double get totalPrice =>
       cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    final cartProvider = ref.read(cartListProvider);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final cartProvider = ref.watch(cartListProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text("My Cart", style: GoogleFonts.abel(fontSize: 22.sp)),
@@ -87,139 +106,238 @@ class _CartScreenState extends State<CartScreen> {
         foregroundColor: Colors.black,
         elevation: 0.5,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.separated(
-              padding: EdgeInsets.all(16.w),
-              itemCount: cartItems.length,
-              separatorBuilder: (context, index) => SizedBox(height: 16.h),
-              itemBuilder: (context, index) {
-                final item = cartItems[index];
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Image.asset(
-                      item.imageUrl,
-                      width: 100.w,
-                      height: 100.h,
-                      fit: BoxFit.contain,
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4.h),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item.name,
-                              style: GoogleFonts.abel(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
+      body: cartProvider.when(
+        data: (snapshot) {
+          double cartTotal = 0;
+          for (var item in snapshot.data) {
+            cartTotal += int.parse(item.price.split('.')[0] ) * item.productCartQuantity;
+          }
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.separated(
+                  padding: EdgeInsets.all(16.w),
+                  itemCount: snapshot.data!.length,
+                  separatorBuilder: (context, index) => SizedBox(height: 16.h),
+                  itemBuilder: (context, index) {
+                    final item = snapshot.data[index];
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 100.w,
+                          height: 100.h,
+
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(10.r),
+                            image: DecorationImage(
+                              image: NetworkImage(item.image),
+                              fit: BoxFit.fill,
                             ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              item.description,
-                              style: GoogleFonts.abel(
-                                fontSize: 14.sp,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            SizedBox(height: 10.h),
-                            Row(
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 4.h),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _quantityButton(
-                                  Icons.remove,
-                                  () => decrementQuantity(index),
-                                ),
-                                SizedBox(width: 10.w),
                                 Text(
-                                  '${item.quantity}',
-                                  style: GoogleFonts.abel(fontSize: 16.sp),
+                                  truncateString(item.title, maxLength: 12),
+                                  style: GoogleFonts.abel(
+                                    fontSize: 18.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                                SizedBox(width: 10.w),
-                                _quantityButton(
-                                  Icons.add,
-                                  () => incrementQuantity(index),
+                                SizedBox(height: 4.h),
+                                Text(
+                                  item.price,
+                                  style: GoogleFonts.abel(
+                                    fontSize: 14.sp,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                SizedBox(height: 10.h),
+                                Row(
+                                  children: [
+                                    _quantityButton(Icons.remove, () {
+                                      setState(() {
+                                        if (item.productCartQuantity > 1) {
+                                          item.productCartQuantity =
+                                              item.productCartQuantity - 1;
+                                        }
+                                      });
+                                      setState(() async {
+                                        final box = await Hive.openBox(
+                                          'userdata',
+                                        );
+                                        final userId = box.get('@id');
+                                        if (item.productCartQuantity > 1) {
+                                          final service = APIStateNetwork(
+                                            await createDio(),
+                                          );
+                                          final response = await service
+                                              .updateCart(
+                                                UpdateCartModel(
+                                                  accessToken: "${userId}",
+                                                  productId:
+                                                      "${item.productId}",
+                                                  cartKey: "${item.cartKey}",
+                                                  quantity:
+                                                      item.productCartQuantity,
+                                                ),
+                                              );
+                                        }
+                                      });
+                                    }),
+                                    SizedBox(width: 10.w),
+                                    Text(
+                                      '${item.productCartQuantity}',
+                                      style: GoogleFonts.abel(fontSize: 16.sp),
+                                    ),
+                                    SizedBox(width: 10.w),
+                                    _quantityButton(Icons.add, () {
+                                      setState(() {
+                                        item.productCartQuantity =
+                                            item.productCartQuantity + 1;
+                                      });
+                                      setState(() async {
+                                        final box = await Hive.openBox(
+                                          'userdata',
+                                        );
+                                        final userId = box.get('@id');
+                                        final service = APIStateNetwork(
+                                          await createDio(),
+                                        );
+                                        final response = await service
+                                            .updateCart(
+                                              UpdateCartModel(
+                                                accessToken: "${userId}",
+                                                productId: "${item.productId}",
+                                                cartKey: "${item.cartKey}",
+                                                quantity:
+                                                    item.productCartQuantity,
+                                              ),
+                                            );
+                                      });
+                                    }),
+                                  ],
                                 ),
                               ],
                             ),
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.close, color: Colors.grey),
+                              onPressed: () async {
+                                Datum? data;
+                                setState(() {
+                                  data = item;
+                                  snapshot.data.removeAt(index);
+                                });
+                                Fluttertoast.showToast(
+                                  msg: "Cart Remove succesfully",
+                                  textColor: Colors.white,
+                                  backgroundColor: Color(0xFF0D5C3E),
+
+                                  toastLength: Toast.LENGTH_LONG,
+                                  gravity: ToastGravity.TOP,
+                                );
+                                final box = await Hive.openBox('userdata');
+                                final id = box.get('@id');
+                                final service = APIStateNetwork(
+                                  await createDio(),
+                                );
+                                final response = await service.removecartItem(
+                                  RemoveCartModel(
+                                    accessToken: "$id",
+                                    productId: "${data!.productId}",
+                                    cartKey: "${data!.cartKey}",
+                                  ),
+                                );
+                              },
+                            ),
+                            SizedBox(height: 10.h),
+                            Text(
+                              "${(int.parse(item.price.split('.')[0] ) * item.productCartQuantity)}",
+                              style: GoogleFonts.abel(fontSize: 16.sp),
+                            ),
                           ],
                         ),
-                      ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(16.w),
+                child: GestureDetector(
+                  onTap: () {
+                    showCheckoutSheet(context);
+                  },
+                  child: Container(
+                    height: 60.h,
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade700,
+                      borderRadius: BorderRadius.circular(16.r),
                     ),
-                    Column(
+                    child: Row(
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.close, color: Colors.grey),
-                          onPressed: () => removeItem(index),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              "Go to Checkout",
+                              style: GoogleFonts.abel(
+                                fontSize: 20.sp,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
                         ),
-                        SizedBox(height: 10.h),
-                        Text(
-                          "\$${(item.price * item.quantity).toStringAsFixed(2)}",
-                          style: GoogleFonts.abel(fontSize: 16.sp),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12.w,
+                              vertical: 6.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 72, 158, 103),
+                              borderRadius: BorderRadius.circular(5.r),
+                            ),
+                            child: Text(
+                              "${cartTotal}",
+                              style: GoogleFonts.abel(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                  ],
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(16.w),
-            child: GestureDetector(
-              onTap: () {
-                showCheckoutSheet(context);
-              },
-              child: Container(
-                height: 60.h,
-                decoration: BoxDecoration(
-                  color: Colors.green.shade700,
-                  borderRadius: BorderRadius.circular(16.r),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Center(
-                        child: Text(
-                          "Go to Checkout",
-                          style: GoogleFonts.abel(
-                            fontSize: 20.sp,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 6.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 72, 158, 103),
-                          borderRadius: BorderRadius.circular(5.r),
-                        ),
-                        child: Text(
-                          "\$${totalPrice.toStringAsFixed(2)}",
-                          style: GoogleFonts.abel(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
+            ],
+          );
+        },
+        error: (error, stack) {
+          return Center(
+            child: Text(
+              "cart is empty",
+              style: GoogleFonts.abel(fontSize: 18.sp),
             ),
-          ),
-        ],
+          );
+        },
+        loading: () {
+          return const Center(child: CircularProgressIndicator());
+        },
       ),
     );
   }
