@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
-
 import 'package:retrofit/retrofit.dart';
 import 'package:vogo/data/models/addTocart.model.dart';
 import 'package:vogo/data/models/cartsList.model.dart';
 import 'package:vogo/data/models/category.model.dart';
+import 'package:vogo/data/models/forgotBodyModel.dart';
+import 'package:vogo/data/models/forgotResModel.dart';
 import 'package:vogo/data/models/login.body.dart';
 import 'package:vogo/data/models/product.detail.model.dart';
 import 'package:vogo/data/models/product.model.dart';
@@ -29,6 +30,7 @@ abstract class APIStateNetwork {
   );
   @GET('/wc/v3/products')
   Future<HttpResponse<List<ProductListResponse>>> getProduct();
+
   @GET("/wc/v3/products")
   Future<List<ProductsByCategoryModel>> getProductsByCategory(
     @Query("category") int categoryId,
@@ -42,7 +44,7 @@ abstract class APIStateNetwork {
   Future<HttpResponse<ProductDetailModel>> getProductDetails(
     @Path("id") int id,
   );
-  // Cart 
+  // Cart
   @GET('/vogofamily/cartlist?access_token={id}')
   Future<HttpResponse<CartListModel>> getCartList(@Path("id") String id);
   @POST('/vogofamily/addtocart')
@@ -52,4 +54,6 @@ abstract class APIStateNetwork {
 
   @POST('/vogofamily/update-cart')
   Future<HttpResponse> updateCart(@Body() UpdateCartModel body);
+  @POST('/vogofamily/forgot')
+  Future<HttpResponse<ForgotresModel>> forgot(@Body() ForgotbodyModel body);
 }
