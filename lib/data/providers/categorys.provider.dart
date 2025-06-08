@@ -14,30 +14,31 @@ class CategoryListNotifier extends StateNotifier<AsyncValue<List<Datum>>> {
   bool _hasMore = true;
   final List<Datum> _categories = [];
 
-  Future<void> fetchNextPage() async {
-    if (_isFetching || !_hasMore) return;
+Future<void> fetchNextPage() async {
+  if (_isFetching || !_hasMore) return;
 
-    _isFetching = true;
+  _isFetching = true;
+  try {
+    final dio = await createDio();
+    final api = APIStateNetwork(dio);
+    final response = await api.getCategory(_perPage, _page);
+    final newData = response.data.data;
 
-    try {
-      final dio = await createDio();
-      final api = APIStateNetwork(dio);
-      final response = await api.getCategory(_perPage, _page);
-      final newData = response.data.data;
-
-      if (newData.isEmpty) {
-        _hasMore = false;
-      } else {
-        _categories.addAll(newData);
-        _page++;
-        state = AsyncValue.data([..._categories]);
-      }
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    } finally {
-      _isFetching = false;
+    if (newData.isEmpty) {
+      _hasMore = false;
+    } else {
+      _categories.addAll(newData);
+      _page++;
+      state = AsyncValue.data([..._categories]);
     }
+  } catch (e, st) {
+    state = AsyncValue.error(e, st);
+  } finally {
+    _isFetching = false;
   }
+
+  }
+  
 
   bool get isFetching => _isFetching;
   bool get hasMore => _hasMore;

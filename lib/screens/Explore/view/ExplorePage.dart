@@ -184,7 +184,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                     return const Padding(
                                       padding: EdgeInsets.all(16),
                                       child: Center(
-                                        child: CircularProgressIndicator(),
+                                        child: SizedBox(),
                                       ),
                                     );
                                   }

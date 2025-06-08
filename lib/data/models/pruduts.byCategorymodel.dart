@@ -4,934 +4,122 @@
 
 import 'dart:convert';
 
-List<ProductsByCategoryModel>? productsByCategoryModelFromJson(String str) => 
-    json.decode(str) == null 
-        ? null 
-        : List<ProductsByCategoryModel>.from(json.decode(str).map((x) => ProductsByCategoryModel.fromJson(x)));
+ProductsByCategoryModel productsByCategoryModelFromJson(String str) => ProductsByCategoryModel.fromJson(json.decode(str));
 
-String? productsByCategoryModelToJson(List<ProductsByCategoryModel>? data) => 
-    data == null ? null : json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String productsByCategoryModelToJson(ProductsByCategoryModel data) => json.encode(data.toJson());
 
 class ProductsByCategoryModel {
-    int? id;
-    String? name;
-    String? slug;
-    String? permalink;
-    DateTime? dateCreated;
-    DateTime? dateCreatedGmt;
-    DateTime? dateModified;
-    DateTime? dateModifiedGmt;
-    String? type;
-    String? status;
-    bool? featured;
-    String? catalogVisibility;
-    String? description;
-    String? shortDescription;
-    String? sku;
-    String? price;
-    String? regularPrice;
-    String? salePrice;
-    dynamic dateOnSaleFrom;
-    dynamic dateOnSaleFromGmt;
-    dynamic dateOnSaleTo;
-    dynamic dateOnSaleToGmt;
-    bool? onSale;
-    bool? purchasable;
-    int? totalSales;
-    bool? virtual;
-    bool? downloadable;
-    List<dynamic>? downloads;
-    int? downloadLimit;
-    int? downloadExpiry;
-    String? externalUrl;
-    String? buttonText;
-    String? taxStatus;
-    String? taxClass;
-    bool? manageStock;
-    dynamic stockQuantity;
-    String? backorders;
-    bool? backordersAllowed;
-    bool? backordered;
-    dynamic lowStockAmount;
-    bool? soldIndividually;
-    String? weight;
-    Dimensions? dimensions;
-    bool? shippingRequired;
-    bool? shippingTaxable;
-    String? shippingClass;
-    int? shippingClassId;
-    bool? reviewsAllowed;
-    String? averageRating;
-    int? ratingCount;
-    List<dynamic>? upsellIds;
-    List<dynamic>? crossSellIds;
-    int? parentId;
-    String? purchaseNote;
-    List<Category>? categories;
-    List<dynamic>? tags;
-    List<Image>? images;
-    List<dynamic>? attributes;
-    List<dynamic>? defaultAttributes;
-    List<dynamic>? variations;
-    List<dynamic>? groupedProducts;
-    int? menuOrder;
-    String? priceHtml;
-    List<int>? relatedIds;
-    List<MetaDatum>? metaData;
-    String? stockStatus;
-    bool? hasOptions;
-    String? postPassword;
-    String? globalUniqueId;
-    String? yoastHead;
-    YoastHeadJson? yoastHeadJson;
-    bool? jetpackSharingEnabled;
-    Links? links;
+    bool status;
+    int code;
+    String message;
+    int currentPage;
+    int totalCount;
+    String currencyCode;
+    String currencySymbol;
+    List<Datum> data;
 
     ProductsByCategoryModel({
-        this.id,
-        this.name,
-        this.slug,
-        this.permalink,
-        this.dateCreated,
-        this.dateCreatedGmt,
-        this.dateModified,
-        this.dateModifiedGmt,
-        this.type,
-        this.status,
-        this.featured,
-        this.catalogVisibility,
-        this.description,
-        this.shortDescription,
-        this.sku,
-        this.price,
-        this.regularPrice,
-        this.salePrice,
-        this.dateOnSaleFrom,
-        this.dateOnSaleFromGmt,
-        this.dateOnSaleTo,
-        this.dateOnSaleToGmt,
-        this.onSale,
-        this.purchasable,
-        this.totalSales,
-        this.virtual,
-        this.downloadable,
-        this.downloads,
-        this.downloadLimit,
-        this.downloadExpiry,
-        this.externalUrl,
-        this.buttonText,
-        this.taxStatus,
-        this.taxClass,
-        this.manageStock,
-        this.stockQuantity,
-        this.backorders,
-        this.backordersAllowed,
-        this.backordered,
-        this.lowStockAmount,
-        this.soldIndividually,
-        this.weight,
-        this.dimensions,
-        this.shippingRequired,
-        this.shippingTaxable,
-        this.shippingClass,
-        this.shippingClassId,
-        this.reviewsAllowed,
-        this.averageRating,
-        this.ratingCount,
-        this.upsellIds,
-        this.crossSellIds,
-        this.parentId,
-        this.purchaseNote,
-        this.categories,
-        this.tags,
-        this.images,
-        this.attributes,
-        this.defaultAttributes,
-        this.variations,
-        this.groupedProducts,
-        this.menuOrder,
-        this.priceHtml,
-        this.relatedIds,
-        this.metaData,
-        this.stockStatus,
-        this.hasOptions,
-        this.postPassword,
-        this.globalUniqueId,
-        this.yoastHead,
-        this.yoastHeadJson,
-        this.jetpackSharingEnabled,
-        this.links,
+        required this.status,
+        required this.code,
+        required this.message,
+        required this.currentPage,
+        required this.totalCount,
+        required this.currencyCode,
+        required this.currencySymbol,
+        required this.data,
     });
 
     factory ProductsByCategoryModel.fromJson(Map<String, dynamic> json) => ProductsByCategoryModel(
+        status: json["status"],
+        code: json["code"],
+        message: json["message"],
+        currentPage: json["currentPage"],
+        totalCount: json["total_count"],
+        currencyCode: json["currency_code"],
+        currencySymbol: json["currency_symbol"],
+        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "status": status,
+        "code": code,
+        "message": message,
+        "currentPage": currentPage,
+        "total_count": totalCount,
+        "currency_code": currencyCode,
+        "currency_symbol": currencySymbol,
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+    };
+}
+
+class Datum {
+    int id;
+    String name;
+    String slug;
+    String price;
+    String regularPrice;
+    String salePrice;
+    String currencySymbol;
+    String currencyCode;
+    String image;
+    List<Category> categories;
+
+    Datum({
+        required this.id,
+        required this.name,
+        required this.slug,
+        required this.price,
+        required this.regularPrice,
+        required this.salePrice,
+        required this.currencySymbol,
+        required this.currencyCode,
+        required this.image,
+        required this.categories,
+    });
+
+    factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         id: json["id"],
         name: json["name"],
         slug: json["slug"],
-        permalink: json["permalink"],
-        dateCreated: json["date_created"] == null ? null : DateTime.parse(json["date_created"]),
-        dateCreatedGmt: json["date_created_gmt"] == null ? null : DateTime.parse(json["date_created_gmt"]),
-        dateModified: json["date_modified"] == null ? null : DateTime.parse(json["date_modified"]),
-        dateModifiedGmt: json["date_modified_gmt"] == null ? null : DateTime.parse(json["date_modified_gmt"]),
-        type: json["type"],
-        status: json["status"],
-        featured: json["featured"],
-        catalogVisibility: json["catalog_visibility"],
-        description: json["description"],
-        shortDescription: json["short_description"],
-        sku: json["sku"],
         price: json["price"],
         regularPrice: json["regular_price"],
         salePrice: json["sale_price"],
-        dateOnSaleFrom: json["date_on_sale_from"],
-        dateOnSaleFromGmt: json["date_on_sale_from_gmt"],
-        dateOnSaleTo: json["date_on_sale_to"],
-        dateOnSaleToGmt: json["date_on_sale_to_gmt"],
-        onSale: json["on_sale"],
-        purchasable: json["purchasable"],
-        totalSales: json["total_sales"],
-        virtual: json["virtual"],
-        downloadable: json["downloadable"],
-        downloads: json["downloads"] == null ? null : List<dynamic>.from(json["downloads"].map((x) => x)),
-        downloadLimit: json["download_limit"],
-        downloadExpiry: json["download_expiry"],
-        externalUrl: json["external_url"],
-        buttonText: json["button_text"],
-        taxStatus: json["tax_status"],
-        taxClass: json["tax_class"],
-        manageStock: json["manage_stock"],
-        stockQuantity: json["stock_quantity"],
-        backorders: json["backorders"],
-        backordersAllowed: json["backorders_allowed"],
-        backordered: json["backordered"],
-        lowStockAmount: json["low_stock_amount"],
-        soldIndividually: json["sold_individually"],
-        weight: json["weight"],
-        dimensions: json["dimensions"] == null ? null : Dimensions.fromJson(json["dimensions"]),
-        shippingRequired: json["shipping_required"],
-        shippingTaxable: json["shipping_taxable"],
-        shippingClass: json["shipping_class"],
-        shippingClassId: json["shipping_class_id"],
-        reviewsAllowed: json["reviews_allowed"],
-        averageRating: json["average_rating"],
-        ratingCount: json["rating_count"],
-        upsellIds: json["upsell_ids"] == null ? null : List<dynamic>.from(json["upsell_ids"].map((x) => x)),
-        crossSellIds: json["cross_sell_ids"] == null ? null : List<dynamic>.from(json["cross_sell_ids"].map((x) => x)),
-        parentId: json["parent_id"],
-        purchaseNote: json["purchase_note"],
-        categories: json["categories"] == null ? null : List<Category>.from(json["categories"].map((x) => Category.fromJson(x))),
-        tags: json["tags"] == null ? null : List<dynamic>.from(json["tags"].map((x) => x)),
-        images: json["images"] == null ? null : List<Image>.from(json["images"].map((x) => Image.fromJson(x))),
-        attributes: json["attributes"] == null ? null : List<dynamic>.from(json["attributes"].map((x) => x)),
-        defaultAttributes: json["default_attributes"] == null ? null : List<dynamic>.from(json["default_attributes"].map((x) => x)),
-        variations: json["variations"] == null ? null : List<dynamic>.from(json["variations"].map((x) => x)),
-        groupedProducts: json["grouped_products"] == null ? null : List<dynamic>.from(json["grouped_products"].map((x) => x)),
-        menuOrder: json["menu_order"],
-        priceHtml: json["price_html"],
-        relatedIds: json["related_ids"] == null ? null : List<int>.from(json["related_ids"].map((x) => x)),
-        metaData: json["meta_data"] == null ? null : List<MetaDatum>.from(json["meta_data"].map((x) => MetaDatum.fromJson(x))),
-        stockStatus: json["stock_status"],
-        hasOptions: json["has_options"],
-        postPassword: json["post_password"],
-        globalUniqueId: json["global_unique_id"],
-        yoastHead: json["yoast_head"],
-        yoastHeadJson: json["yoast_head_json"] == null ? null : YoastHeadJson.fromJson(json["yoast_head_json"]),
-        jetpackSharingEnabled: json["jetpack_sharing_enabled"],
-        links: json["_links"] == null ? null : Links.fromJson(json["_links"]),
+        currencySymbol: json["currency_symbol"],
+        currencyCode: json["currency_code"],
+        image: json["image"],
+        categories: List<Category>.from(json["categories"].map((x) => Category.fromJson(x))),
     );
 
     Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
         "slug": slug,
-        "permalink": permalink,
-        "date_created": dateCreated?.toIso8601String(),
-        "date_created_gmt": dateCreatedGmt?.toIso8601String(),
-        "date_modified": dateModified?.toIso8601String(),
-        "date_modified_gmt": dateModifiedGmt?.toIso8601String(),
-        "type": type,
-        "status": status,
-        "featured": featured,
-        "catalog_visibility": catalogVisibility,
-        "description": description,
-        "short_description": shortDescription,
-        "sku": sku,
         "price": price,
         "regular_price": regularPrice,
         "sale_price": salePrice,
-        "date_on_sale_from": dateOnSaleFrom,
-        "date_on_sale_from_gmt": dateOnSaleFromGmt,
-        "date_on_sale_to": dateOnSaleTo,
-        "date_on_sale_to_gmt": dateOnSaleToGmt,
-        "on_sale": onSale,
-        "purchasable": purchasable,
-        "total_sales": totalSales,
-        "virtual": virtual,
-        "downloadable": downloadable,
-        "downloads": downloads == null ? null : List<dynamic>.from(downloads!.map((x) => x)),
-        "download_limit": downloadLimit,
-        "download_expiry": downloadExpiry,
-        "external_url": externalUrl,
-        "button_text": buttonText,
-        "tax_status": taxStatus,
-        "tax_class": taxClass,
-        "manage_stock": manageStock,
-        "stock_quantity": stockQuantity,
-        "backorders": backorders,
-        "backorders_allowed": backordersAllowed,
-        "backordered": backordered,
-        "low_stock_amount": lowStockAmount,
-        "sold_individually": soldIndividually,
-        "weight": weight,
-        "dimensions": dimensions?.toJson(),
-        "shipping_required": shippingRequired,
-        "shipping_taxable": shippingTaxable,
-        "shipping_class": shippingClass,
-        "shipping_class_id": shippingClassId,
-        "reviews_allowed": reviewsAllowed,
-        "average_rating": averageRating,
-        "rating_count": ratingCount,
-        "upsell_ids": upsellIds == null ? null : List<dynamic>.from(upsellIds!.map((x) => x)),
-        "cross_sell_ids": crossSellIds == null ? null : List<dynamic>.from(crossSellIds!.map((x) => x)),
-        "parent_id": parentId,
-        "purchase_note": purchaseNote,
-        "categories": categories == null ? null : List<dynamic>.from(categories!.map((x) => x.toJson())),
-        "tags": tags == null ? null : List<dynamic>.from(tags!.map((x) => x)),
-        "images": images == null ? null : List<dynamic>.from(images!.map((x) => x.toJson())),
-        "attributes": attributes == null ? null : List<dynamic>.from(attributes!.map((x) => x)),
-        "default_attributes": defaultAttributes == null ? null : List<dynamic>.from(defaultAttributes!.map((x) => x)),
-        "variations": variations == null ? null : List<dynamic>.from(variations!.map((x) => x)),
-        "grouped_products": groupedProducts == null ? null : List<dynamic>.from(groupedProducts!.map((x) => x)),
-        "menu_order": menuOrder,
-        "price_html": priceHtml,
-        "related_ids": relatedIds == null ? null : List<dynamic>.from(relatedIds!.map((x) => x)),
-        "meta_data": metaData == null ? null : List<dynamic>.from(metaData!.map((x) => x.toJson())),
-        "stock_status": stockStatus,
-        "has_options": hasOptions,
-        "post_password": postPassword,
-        "global_unique_id": globalUniqueId,
-        "yoast_head": yoastHead,
-        "yoast_head_json": yoastHeadJson?.toJson(),
-        "jetpack_sharing_enabled": jetpackSharingEnabled,
-        "_links": links?.toJson(),
+        "currency_symbol": currencySymbol,
+        "currency_code": currencyCode,
+        "image": image,
+        "categories": List<dynamic>.from(categories.map((x) => x.toJson())),
     };
 }
 
 class Category {
-    int? id;
-    String? name;
-    String? slug;
+    int id;
+    String name;
 
     Category({
-        this.id,
-        this.name,
-        this.slug,
+        required this.id,
+        required this.name,
     });
 
     factory Category.fromJson(Map<String, dynamic> json) => Category(
         id: json["id"],
         name: json["name"],
-        slug: json["slug"],
     );
 
     Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
-        "slug": slug,
-    };
-}
-
-class Dimensions {
-    String? length;
-    String? width;
-    String? height;
-
-    Dimensions({
-        this.length,
-        this.width,
-        this.height,
-    });
-
-    factory Dimensions.fromJson(Map<String, dynamic> json) => Dimensions(
-        length: json["length"],
-        width: json["width"],
-        height: json["height"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "length": length,
-        "width": width,
-        "height": height,
-    };
-}
-
-class Image {
-    int? id;
-    DateTime? dateCreated;
-    DateTime? dateCreatedGmt;
-    DateTime? dateModified;
-    DateTime? dateModifiedGmt;
-    String? src;
-    String? name;
-    String? alt;
-
-    Image({
-        this.id,
-        this.dateCreated,
-        this.dateCreatedGmt,
-        this.dateModified,
-        this.dateModifiedGmt,
-        this.src,
-        this.name,
-        this.alt,
-    });
-
-    factory Image.fromJson(Map<String, dynamic> json) => Image(
-        id: json["id"],
-        dateCreated: json["date_created"] == null ? null : DateTime.parse(json["date_created"]),
-        dateCreatedGmt: json["date_created_gmt"] == null ? null : DateTime.parse(json["date_created_gmt"]),
-        dateModified: json["date_modified"] == null ? null : DateTime.parse(json["date_modified"]),
-        dateModifiedGmt: json["date_modified_gmt"] == null ? null : DateTime.parse(json["date_modified_gmt"]),
-        src: json["src"],
-        name: json["name"],
-        alt: json["alt"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "date_created": dateCreated?.toIso8601String(),
-        "date_created_gmt": dateCreatedGmt?.toIso8601String(),
-        "date_modified": dateModified?.toIso8601String(),
-        "date_modified_gmt": dateModifiedGmt?.toIso8601String(),
-        "src": src,
-        "name": name,
-        "alt": alt,
-    };
-}
-
-class Links {
-    List<Self>? self;
-    List<Collection>? collection;
-
-    Links({
-        this.self,
-        this.collection,
-    });
-
-    factory Links.fromJson(Map<String, dynamic> json) => Links(
-        self: json["self"] == null ? null : List<Self>.from(json["self"].map((x) => Self.fromJson(x))),
-        collection: json["collection"] == null ? null : List<Collection>.from(json["collection"].map((x) => Collection.fromJson(x))),
-    );
-
-    Map<String, dynamic> toJson() => {
-        "self": self == null ? null : List<dynamic>.from(self!.map((x) => x.toJson())),
-        "collection": collection == null ? null : List<dynamic>.from(collection!.map((x) => x.toJson())),
-    };
-}
-
-class Collection {
-    String? href;
-
-    Collection({
-        this.href,
-    });
-
-    factory Collection.fromJson(Map<String, dynamic> json) => Collection(
-        href: json["href"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "href": href,
-    };
-}
-
-class Self {
-    String? href;
-    TargetHints? targetHints;
-
-    Self({
-        this.href,
-        this.targetHints,
-    });
-
-    factory Self.fromJson(Map<String, dynamic> json) => Self(
-        href: json["href"],
-        targetHints: json["targetHints"] == null ? null : TargetHints.fromJson(json["targetHints"]),
-    );
-
-    Map<String, dynamic> toJson() => {
-        "href": href,
-        "targetHints": targetHints?.toJson(),
-    };
-}
-
-class TargetHints {
-    List<String>? allow;
-
-    TargetHints({
-        this.allow,
-    });
-
-    factory TargetHints.fromJson(Map<String, dynamic> json) => TargetHints(
-        allow: json["allow"] == null ? null : List<String>.from(json["allow"].map((x) => x)),
-    );
-
-    Map<String, dynamic> toJson() => {
-        "allow": allow == null ? null : List<dynamic>.from(allow!.map((x) => x)),
-    };
-}
-
-class MetaDatum {
-    int? id;
-    String? key;
-    dynamic value;
-
-    MetaDatum({
-        this.id,
-        this.key,
-        this.value,
-    });
-
-    factory MetaDatum.fromJson(Map<String, dynamic> json) => MetaDatum(
-        id: json["id"],
-        key: json["key"],
-        value: json["value"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "key": key,
-        "value": value,
-    };
-}
-
-class ValueClass {
-    The5857? the5857;
-
-    ValueClass({
-        this.the5857,
-    });
-
-    factory ValueClass.fromJson(Map<String, dynamic> json) => ValueClass(
-        the5857: json["5857"] == null ? null : The5857.fromJson(json["5857"]),
-    );
-
-    Map<String, dynamic> toJson() => {
-        "5857": the5857?.toJson(),
-    };
-}
-
-class The5857 {
-    String? videoType;
-    String? uploadVideoId;
-    String? uploadVideoUrl;
-    String? youtubeUrl;
-    String? vimeoUrl;
-    String? autoplay;
-    String? videoSize;
-    String? videoControl;
-    String? hideGalleryImg;
-    String? hideInformation;
-    String? audioStatus;
-
-    The5857({
-        this.videoType,
-        this.uploadVideoId,
-        this.uploadVideoUrl,
-        this.youtubeUrl,
-        this.vimeoUrl,
-        this.autoplay,
-        this.videoSize,
-        this.videoControl,
-        this.hideGalleryImg,
-        this.hideInformation,
-        this.audioStatus,
-    });
-
-    factory The5857.fromJson(Map<String, dynamic> json) => The5857(
-        videoType: json["video_type"],
-        uploadVideoId: json["upload_video_id"],
-        uploadVideoUrl: json["upload_video_url"],
-        youtubeUrl: json["youtube_url"],
-        vimeoUrl: json["vimeo_url"],
-        autoplay: json["autoplay"],
-        videoSize: json["video_size"],
-        videoControl: json["video_control"],
-        hideGalleryImg: json["hide_gallery_img"],
-        hideInformation: json["hide_information"],
-        audioStatus: json["audio_status"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "video_type": videoType,
-        "upload_video_id": uploadVideoId,
-        "upload_video_url": uploadVideoUrl,
-        "youtube_url": youtubeUrl,
-        "vimeo_url": vimeoUrl,
-        "autoplay": autoplay,
-        "video_size": videoSize,
-        "video_control": videoControl,
-        "hide_gallery_img": hideGalleryImg,
-        "hide_information": hideInformation,
-        "audio_status": audioStatus,
-    };
-}
-
-class YoastHeadJson {
-    String? title;
-    Robots? robots;
-    String? canonical;
-    String? ogLocale;
-    String? ogType;
-    String? ogTitle;
-    String? ogDescription;
-    String? ogUrl;
-    String? ogSiteName;
-    DateTime? articleModifiedTime;
-    List<OgImage>? ogImage;
-    String? twitterCard;
-    TwitterMisc? twitterMisc;
-    Schema? schema;
-
-    YoastHeadJson({
-        this.title,
-        this.robots,
-        this.canonical,
-        this.ogLocale,
-        this.ogType,
-        this.ogTitle,
-        this.ogDescription,
-        this.ogUrl,
-        this.ogSiteName,
-        this.articleModifiedTime,
-        this.ogImage,
-        this.twitterCard,
-        this.twitterMisc,
-        this.schema,
-    });
-
-    factory YoastHeadJson.fromJson(Map<String, dynamic> json) => YoastHeadJson(
-        title: json["title"],
-        robots: json["robots"] == null ? null : Robots.fromJson(json["robots"]),
-        canonical: json["canonical"],
-        ogLocale: json["og_locale"],
-        ogType: json["og_type"],
-        ogTitle: json["og_title"],
-        ogDescription: json["og_description"],
-        ogUrl: json["og_url"],
-        ogSiteName: json["og_site_name"],
-        articleModifiedTime: json["article_modified_time"] == null ? null : DateTime.parse(json["article_modified_time"]),
-        ogImage: json["og_image"] == null ? null : List<OgImage>.from(json["og_image"].map((x) => OgImage.fromJson(x))),
-        twitterCard: json["twitter_card"],
-        twitterMisc: json["twitter_misc"] == null ? null : TwitterMisc.fromJson(json["twitter_misc"]),
-        schema: json["schema"] == null ? null : Schema.fromJson(json["schema"]),
-    );
-
-    Map<String, dynamic> toJson() => {
-        "title": title,
-        "robots": robots?.toJson(),
-        "canonical": canonical,
-        "og_locale": ogLocale,
-        "og_type": ogType,
-        "og_title": ogTitle,
-        "og_description": ogDescription,
-        "og_url": ogUrl,
-        "og_site_name": ogSiteName,
-        "article_modified_time": articleModifiedTime?.toIso8601String(),
-        "og_image": ogImage == null ? null : List<dynamic>.from(ogImage!.map((x) => x.toJson())),
-        "twitter_card": twitterCard,
-        "twitter_misc": twitterMisc?.toJson(),
-        "schema": schema?.toJson(),
-    };
-}
-
-class OgImage {
-    int? width;
-    int? height;
-    String? url;
-    String? type;
-
-    OgImage({
-        this.width,
-        this.height,
-        this.url,
-        this.type,
-    });
-
-    factory OgImage.fromJson(Map<String, dynamic> json) => OgImage(
-        width: json["width"],
-        height: json["height"],
-        url: json["url"],
-        type: json["type"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "width": width,
-        "height": height,
-        "url": url,
-        "type": type,
-    };
-}
-
-class Robots {
-    String? index;
-    String? follow;
-    String? maxSnippet;
-    String? maxImagePreview;
-    String? maxVideoPreview;
-
-    Robots({
-        this.index,
-        this.follow,
-        this.maxSnippet,
-        this.maxImagePreview,
-        this.maxVideoPreview,
-    });
-
-    factory Robots.fromJson(Map<String, dynamic> json) => Robots(
-        index: json["index"],
-        follow: json["follow"],
-        maxSnippet: json["max-snippet"],
-        maxImagePreview: json["max-image-preview"],
-        maxVideoPreview: json["max-video-preview"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "index": index,
-        "follow": follow,
-        "max-snippet": maxSnippet,
-        "max-image-preview": maxImagePreview,
-        "max-video-preview": maxVideoPreview,
-    };
-}
-
-class Schema {
-    String? context;
-    List<Graph>? graph;
-
-    Schema({
-        this.context,
-        this.graph,
-    });
-
-    factory Schema.fromJson(Map<String, dynamic> json) => Schema(
-        context: json["@context"],
-        graph: json["@graph"] == null ? null : List<Graph>.from(json["@graph"].map((x) => Graph.fromJson(x))),
-    );
-
-    Map<String, dynamic> toJson() => {
-        "@context": context,
-        "@graph": graph == null ? null : List<dynamic>.from(graph!.map((x) => x.toJson())),
-    };
-}
-
-class Graph {
-    String? type;
-    String? id;
-    String? url;
-    String? name;
-    Breadcrumb? isPartOf;
-    Breadcrumb? primaryImageOfPage;
-    Breadcrumb? image;
-    String? thumbnailUrl;
-    DateTime? datePublished;
-    DateTime? dateModified;
-    Breadcrumb? breadcrumb;
-    String? inLanguage;
-    List<PotentialAction>? potentialAction;
-    String? contentUrl;
-    int? width;
-    int? height;
-    List<ItemListElement>? itemListElement;
-    String? description;
-
-    Graph({
-        this.type,
-        this.id,
-        this.url,
-        this.name,
-        this.isPartOf,
-        this.primaryImageOfPage,
-        this.image,
-        this.thumbnailUrl,
-        this.datePublished,
-        this.dateModified,
-        this.breadcrumb,
-        this.inLanguage,
-        this.potentialAction,
-        this.contentUrl,
-        this.width,
-        this.height,
-        this.itemListElement,
-        this.description,
-    });
-
-    factory Graph.fromJson(Map<String, dynamic> json) => Graph(
-        type: json["@type"],
-        id: json["@id"],
-        url: json["url"],
-        name: json["name"],
-        isPartOf: json["isPartOf"] == null ? null : Breadcrumb.fromJson(json["isPartOf"]),
-        primaryImageOfPage: json["primaryImageOfPage"] == null ? null : Breadcrumb.fromJson(json["primaryImageOfPage"]),
-        image: json["image"] == null ? null : Breadcrumb.fromJson(json["image"]),
-        thumbnailUrl: json["thumbnailUrl"],
-        datePublished: json["datePublished"] == null ? null : DateTime.parse(json["datePublished"]),
-        dateModified: json["dateModified"] == null ? null : DateTime.parse(json["dateModified"]),
-        breadcrumb: json["breadcrumb"] == null ? null : Breadcrumb.fromJson(json["breadcrumb"]),
-        inLanguage: json["inLanguage"],
-        potentialAction: json["potentialAction"] == null ? null : List<PotentialAction>.from(json["potentialAction"].map((x) => PotentialAction.fromJson(x))),
-        contentUrl: json["contentUrl"],
-        width: json["width"],
-        height: json["height"],
-        itemListElement: json["itemListElement"] == null ? null : List<ItemListElement>.from(json["itemListElement"].map((x) => ItemListElement.fromJson(x))),
-        description: json["description"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "@type": type,
-        "@id": id,
-        "url": url,
-        "name": name,
-        "isPartOf": isPartOf?.toJson(),
-        "primaryImageOfPage": primaryImageOfPage?.toJson(),
-        "image": image?.toJson(),
-        "thumbnailUrl": thumbnailUrl,
-        "datePublished": datePublished?.toIso8601String(),
-        "dateModified": dateModified?.toIso8601String(),
-        "breadcrumb": breadcrumb?.toJson(),
-        "inLanguage": inLanguage,
-        "potentialAction": potentialAction == null ? null : List<dynamic>.from(potentialAction!.map((x) => x.toJson())),
-        "contentUrl": contentUrl,
-        "width": width,
-        "height": height,
-        "itemListElement": itemListElement == null ? null : List<dynamic>.from(itemListElement!.map((x) => x.toJson())),
-        "description": description,
-    };
-}
-
-class Breadcrumb {
-    String? id;
-
-    Breadcrumb({
-        this.id,
-    });
-
-    factory Breadcrumb.fromJson(Map<String, dynamic> json) => Breadcrumb(
-        id: json["@id"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "@id": id,
-    };
-}
-
-class ItemListElement {
-    String? type;
-    int? position;
-    String? name;
-    String? item;
-
-    ItemListElement({
-        this.type,
-        this.position,
-        this.name,
-        this.item,
-    });
-
-    factory ItemListElement.fromJson(Map<String, dynamic> json) => ItemListElement(
-        type: json["@type"],
-        position: json["position"],
-        name: json["name"],
-        item: json["item"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "@type": type,
-        "position": position,
-        "name": name,
-        "item": item,
-    };
-}
-
-class PotentialAction {
-    String? type;
-    dynamic target;
-    QueryInput? queryInput;
-
-    PotentialAction({
-        this.type,
-        this.target,
-        this.queryInput,
-    });
-
-    factory PotentialAction.fromJson(Map<String, dynamic> json) => PotentialAction(
-        type: json["@type"],
-        target: json["target"],
-        queryInput: json["query-input"] == null ? null : QueryInput.fromJson(json["query-input"]),
-    );
-
-    Map<String, dynamic> toJson() => {
-        "@type": type,
-        "target": target,
-        "query-input": queryInput?.toJson(),
-    };
-}
-
-class QueryInput {
-    String? type;
-    bool? valueRequired;
-    String? valueName;
-
-    QueryInput({
-        this.type,
-        this.valueRequired,
-        this.valueName,
-    });
-
-    factory QueryInput.fromJson(Map<String, dynamic> json) => QueryInput(
-        type: json["@type"],
-        valueRequired: json["valueRequired"],
-        valueName: json["valueName"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "@type": type,
-        "valueRequired": valueRequired,
-        "valueName": valueName,
-    };
-}
-
-class TargetClass {
-    String? type;
-    String? urlTemplate;
-
-    TargetClass({
-        this.type,
-        this.urlTemplate,
-    });
-
-    factory TargetClass.fromJson(Map<String, dynamic> json) => TargetClass(
-        type: json["@type"],
-        urlTemplate: json["urlTemplate"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "@type": type,
-        "urlTemplate": urlTemplate,
-    };
-}
-
-class TwitterMisc {
-    String? estReadingTime;
-
-    TwitterMisc({
-        this.estReadingTime,
-    });
-
-    factory TwitterMisc.fromJson(Map<String, dynamic> json) => TwitterMisc(
-        estReadingTime: json["Est. reading time"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "Est. reading time": estReadingTime,
     };
 }

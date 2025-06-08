@@ -7,9 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:vogo/core/network/api.state.dart';
 import 'package:vogo/core/utils/preety.dio.dart';
 import 'package:vogo/data/models/addTocart.model.dart';
+import 'package:vogo/data/models/addwishlist.model.dart';
 import 'package:vogo/data/providers/product.detail.provider.dart';
 import 'package:vogo/screens/MyCart/view/MyCartpage.dart';
 
@@ -145,10 +147,44 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 IconButton(
-                                  onPressed: () {
+                                  onPressed: () async {
                                     setState(() {
                                       isFavorite = !isFavorite;
                                     });
+                                    final service = APIStateNetwork(
+                                      await createDio(),
+                                    );
+                                    var box = await Hive.openBox('userdata');
+                                    final userId = box.get('@id');
+                                    if (isFavorite == true) {
+                                      await service.addToWishList(
+                                        AddWishListBody(
+                                          accessToken: userId,
+                                          productId: snapshot.id.toString(),
+                                        ),
+                                      );
+                                      Fluttertoast.showToast(
+                                        msg: "Added to Wishlist",
+                                        textColor: Colors.white,
+                                        backgroundColor: Colors.green,
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.TOP,
+                                      );
+                                    } else {
+                                      await service.removeWishListItem(
+                                        AddWishListBody(
+                                          accessToken: userId,
+                                          productId: snapshot.id.toString(),
+                                        ),
+                                      );
+                                      Fluttertoast.showToast(
+                                        msg: "Removed from Wishlist",
+                                        textColor: Colors.white,
+                                        backgroundColor: Colors.red,
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.TOP,
+                                      );
+                                    }
                                   },
                                   icon: Icon(
                                     isFavorite
@@ -390,8 +426,15 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         );
       },
       loading:
-          () =>
-              const Scaffold(body: Center(child: CircularProgressIndicator())),
+          () => Scaffold(
+            body: Center(
+              child: LoadingAnimationWidget.flickr(
+                leftDotColor: Colors.green.shade700,
+                rightDotColor: Colors.blue,
+                size: 40,
+              ),
+            ),
+          ),
     );
   }
 

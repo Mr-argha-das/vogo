@@ -58,7 +58,6 @@ class Datum {
     String slug;
     String description;
     String image;
-    bool hasChildren;
 
     Datum({
         required this.id,
@@ -66,7 +65,6 @@ class Datum {
         required this.slug,
         required this.description,
         required this.image,
-        required this.hasChildren,
     });
 
     factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -75,7 +73,6 @@ class Datum {
         slug: json["slug"],
         description: json["description"],
         image: json["image"],
-        hasChildren: json["has_children"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -84,6 +81,5 @@ class Datum {
         "slug": slug,
         "description": description,
         "image": image,
-        "has_children": hasChildren,
     };
 }

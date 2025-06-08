@@ -3,12 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:vogo/core/auth/social.auth.dart';
 import 'package:vogo/screens/Singin/view/Bynumber.dart';
 import 'package:vogo/screens/Singup/view/SingupPage.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  bool _googleBtn = false;
+  bool _faceBookBtn = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,17 +45,17 @@ class RegisterScreen extends StatelessWidget {
               ),
               SizedBox(height: 20.h),
 
-              InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                      builder: (context) => NumberInputScreen(),
-                    ),
-                  );
-                },
-                child: PhoneNumberSection(),
-              ),
+              // InkWell(
+              //   onTap: () {
+              //     Navigator.push(
+              //       context,
+              //       CupertinoPageRoute(
+              //         builder: (context) => NumberInputScreen(),
+              //       ),
+              //     );
+              //   },
+              //   child: PhoneNumberSection(),
+              // ),
 
               Divider(thickness: 1),
 
@@ -59,30 +67,48 @@ class RegisterScreen extends StatelessWidget {
               ),
 
               SizedBox(height: 20.h),
-              Container(
-                height: 67.h,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: const Color.fromARGB(255, 83, 131, 236),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: 24.h,
-                      width: 24.w,
-                      child: Image.asset('assets/Images/icons8-google-480.png'),
+              GestureDetector(
+                onTap: ()async {
+                  setState(() {
+                    _googleBtn = true;
+                  });
+                  try{
+                    await SocialAuth.signInWithGoogle(context);
+                  } catch (e) {
+                    setState(() {
+                      _googleBtn = false;
+                    });
+                  }
+                },
+                child: Container(
+                  height: 67.h,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: const Color.fromARGB(255, 83, 131, 236),
+                  ),
+                  child: _googleBtn == true? Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
                     ),
-                    SizedBox(width: 10.w),
-                    Text(
-                      "Continue with Google",
-                      style: GoogleFonts.abel(
-                        fontSize: 18,
-                        color: Colors.white,
+                  ) : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 24.h,
+                        width: 24.w,
+                        child: Image.asset('assets/Images/icons8-google-480.png'),
                       ),
-                    ),
-                  ],
+                      SizedBox(width: 10.w),
+                      Text(
+                        "Continue with Google",
+                        style: GoogleFonts.abel(
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               // // Google Button
@@ -92,32 +118,50 @@ class RegisterScreen extends StatelessWidget {
               //   color: const Color(0xFF4285F4),
               // ),
               SizedBox(height: 16.h),
-              Container(
-                height: 67.h,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: const Color.fromARGB(255, 74, 102, 172),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: 24.h,
-                      width: 24.w,
-                      child: Image.asset(
-                        'assets/Images/icons8-facebook-480.png',
-                      ),
+              GestureDetector(
+                onTap: ()async{
+                  setState(() {
+                    _faceBookBtn = true;
+                  });
+                  try{
+                    await SocialAuth.loginWithFacebook(context);
+                  } catch (e) {
+                    setState(() {
+                      _faceBookBtn = false;
+                    });
+                  }
+                },
+                child: Container(
+                  height: 67.h,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: const Color.fromARGB(255, 74, 102, 172),
+                  ),
+                  child: _faceBookBtn == true? Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
                     ),
-                    SizedBox(width: 10.w),
-                    Text(
-                      "Continue with Facebook",
-                      style: GoogleFonts.abel(
-                        fontSize: 18,
-                        color: Colors.white,
+                  )  : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 24.h,
+                        width: 24.w,
+                        child: Image.asset(
+                          'assets/Images/icons8-facebook-480.png',
+                        ),
                       ),
-                    ),
-                  ],
+                      SizedBox(width: 10.w),
+                      Text(
+                        "Continue with Facebook",
+                        style: GoogleFonts.abel(
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               // // Facebook Button

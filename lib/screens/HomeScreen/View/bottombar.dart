@@ -18,7 +18,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   final List<Widget> _screens = [
     HomeScreen(),
-    ExploreScreen(),
+    // ExploreScreen(),
     CartScreen(),
     FavouriteScreen(),
     ProfileScreen()
@@ -47,10 +47,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
             icon: Icon(Icons.storefront),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: 'Explore',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.explore),
+          //   label: 'Explore',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
             label: 'Cart',

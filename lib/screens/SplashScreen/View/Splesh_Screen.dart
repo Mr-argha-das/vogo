@@ -46,21 +46,21 @@ class _SplashScreen1State extends State<SplashScreen1> {
               ),
             ),
 
-            Text(
-              'Bine ați venit!\nVOGO - cel mai mare mall\ndigital din România',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.aDLaMDisplay(
-                fontSize: 32.sp,
+            // Text(
+            //   'Bine ați venit!\nVOGO - cel mai mare mall\ndigital din România',
+            //   textAlign: TextAlign.center,
+            //   style: GoogleFonts.aDLaMDisplay(
+            //     fontSize: 32.sp,
 
-                color: Colors.yellowAccent,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 60.h),
-            Text(
-              'VOGO.family',
-              style: GoogleFonts.abel(fontSize: 24.sp, color: Colors.white),
-            ),
+            //     color: Colors.yellowAccent,
+            //     fontWeight: FontWeight.bold,
+            //   ),
+            // ),
+            // SizedBox(height: 60.h),
+            // Text(
+            //   'VOGO.family',
+            //   style: GoogleFonts.abel(fontSize: 24.sp, color: Colors.white),
+            // ),
           ],
         ),
       ),
@@ -106,10 +106,16 @@ class SplashScreen2 extends StatelessWidget {
                       children: [
                         GestureDetector(
                           onTap: () {
+                            // Navigator.push(
+                            //   context,
+                            //   CupertinoPageRoute(
+                            //     builder: (context) => SignUpScreen(),
+                            //   ),
+                            // );
                             Navigator.push(
                               context,
                               CupertinoPageRoute(
-                                builder: (context) => SignUpScreen(),
+                                builder: (context) => RegisterScreen(),
                               ),
                             );
                           },

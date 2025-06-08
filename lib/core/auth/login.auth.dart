@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -19,18 +20,31 @@ class Auth {
     String password,
     BuildContext context,
   ) async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    // Request permission (important on iOS)
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    String? token = await messaging.getToken();
+     log('FCM Token: $token');
+
     final dio = await createDio();
     final service = APIStateNetwork(dio);
     final response = await service.login(
-      LoginBody(email: email, password: password, deviceToken: 'device_token'),
+      LoginBody(email: email, password: password, deviceToken: '$token'),
     );
-
+    
     if (response.response.data['status'] == true) {
       final box = await Hive.openBox('userdata');
+      await box.clear();
       LoginResponse userdata = LoginResponse.fromJson(response.response.data);
       await box.put('name', userdata.data.username);
       await box.put('@id', userdata.data.id);
       await box.put('email', userdata.data.email);
+      await box.put('@fcm_token', '$token');
       Fluttertoast.showToast(
         msg: response.response.data['message'],
         toastLength: Toast.LENGTH_SHORT,
@@ -75,6 +89,7 @@ class Auth {
     );
     if (response.response.data['status'] == true) {
       final box = await Hive.openBox('userdata');
+      await box.clear();
       RegisterResponse data = RegisterResponse.fromJson(response.response.data);
       await box.put('name', data.data.userName);
       await box.put('@id', data.data.userId);

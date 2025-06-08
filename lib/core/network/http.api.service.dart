@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +14,7 @@ class ApiService {
   ApiService._(this.dio);
 
   static Future<ApiService> create() async {
-    final dio = await createDio(); // Your pretty dio setup
+    final dio = await createDio();
     dio.interceptors.add(
       OAuth1Interceptor(
         consumerKey: 'ck_91e6fa3aac7b5c40ac5a9a1ec0743c0791472e62',
@@ -22,51 +24,47 @@ class ApiService {
     return ApiService._(dio);
   }
 
-  Future<List<ProductsByCategoryModel>> getProductsByCategory({
+  Future<ProductsByCategoryModel> getProductsByCategory({
     required int categoryId,
     required int perPage,
     required int page,
     String? searchQuery,
   }) async {
     final response = await dio.get(
-      'https://vogo.family/wp-json/wc/v3/products',
+      'https://vogo.family/wp-json/vogofamily/product-list',
       queryParameters: {
         'category': categoryId,
         'per_page': perPage,
         'page': page,
-        if (searchQuery != null && searchQuery.isNotEmpty)
-          'search': searchQuery,
+        if (searchQuery != null && searchQuery.isNotEmpty) 'search': searchQuery,
       },
     );
 
-    final data = response.data;
-    return (data as List)
-        .map((json) => ProductsByCategoryModel.fromJson(json))
-        .toList();
+    log("API response status code: ${response.statusCode}");
+    return ProductsByCategoryModel.fromJson(response.data);
   }
 }
+
 
 final apiServiceProvider = FutureProvider<ApiService>((ref) async {
   return await ApiService.create();
 });
 
 final productsProvider = StateNotifierProvider.autoDispose
-    .family<ProductsNotifier, List<ProductsByCategoryModel>, int>((
-      ref,
-      categoryId,
-    ) {
-      final apiService = ref
-          .watch(apiServiceProvider)
-          .maybeWhen(data: (api) => api, orElse: () => null);
+    .family<ProductsNotifier, ProductsByCategoryModel?, int>((ref, categoryId) {
+  final apiService = ref.watch(apiServiceProvider).maybeWhen(
+        data: (api) => api,
+        orElse: () => null,
+      );
 
-      return ProductsNotifier(apiService, categoryId);
-    });
+  return ProductsNotifier(apiService, categoryId);
+});
 
-class ProductsNotifier extends StateNotifier<List<ProductsByCategoryModel>> {
+class ProductsNotifier extends StateNotifier<ProductsByCategoryModel?> {
   final ApiService? _apiService;
   final int _categoryId;
 
-  ProductsNotifier(this._apiService, this._categoryId) : super([]) {
+  ProductsNotifier(this._apiService, this._categoryId) : super(null) {
     if (_apiService != null) loadInitial();
   }
 
@@ -75,24 +73,22 @@ class ProductsNotifier extends StateNotifier<List<ProductsByCategoryModel>> {
   bool _hasMore = true;
   String _searchQuery = '';
 
-  int get currentPage => _currentPage;
+  List<Datum> get allProducts => state?.data ?? [];
   bool get hasMore => _hasMore;
-  String get searchQuery => _searchQuery;
 
-  // To update the search query
   void updateSearchQuery(String query) {
     _searchQuery = query;
-    loadInitial(); // Reload the products based on new search query
+    loadInitial();
   }
 
-  void clearData(){
-    state = [];
+  void clearData() {
+    state = null;
   }
 
   Future<void> loadInitial() async {
     _currentPage = 1;
     _hasMore = true;
-    state = []; // Reset the products list
+    state = null; // reset
     await loadMore();
   }
 
@@ -100,56 +96,46 @@ class ProductsNotifier extends StateNotifier<List<ProductsByCategoryModel>> {
     if (_isLoading || !_hasMore || _apiService == null) return;
 
     _isLoading = true;
-    final newProducts = await _apiService!.getProductsByCategory(
-      categoryId: _categoryId,
-      perPage: 30,
-      page: _currentPage,
-      searchQuery: _searchQuery, // Pass the search query to the API
-    );
-    if (newProducts.isEmpty) {
-      Fluttertoast.showToast(
-        msg: "No more products available",
-        toastLength: Toast.LENGTH_SHORT,
-        backgroundColor: Colors.green
+    try {
+      final newData = await _apiService!.getProductsByCategory(
+        categoryId: _categoryId,
+        perPage: 20,
+        page: _currentPage,
+        searchQuery: _searchQuery,
       );
-      _hasMore = false;
-    } else {
-      state = [...state, ...newProducts];
-      _currentPage++;
-    }
 
-    if (newProducts.isEmpty) {
-      _hasMore = false;
-    } else {
-      state = [...state, ...newProducts];
+      log('Loaded products: ${newData.data.length}');
+
+      if (newData.data.isEmpty) {
+        Fluttertoast.showToast(
+          msg: "No more products available",
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.green,
+        );
+        _hasMore = false;
+      }
+
+      if (_currentPage == 1) {
+        state = newData;
+      } else {
+        final previous = state!;
+        state = ProductsByCategoryModel(
+          status: newData.status,
+          code: newData.code,
+          message: newData.message,
+          currentPage: newData.currentPage,
+          totalCount: newData.totalCount,
+          currencyCode: newData.currencyCode,
+          currencySymbol: newData.currencySymbol,
+          data: [...previous.data, ...newData.data],
+        );
+      }
+
       _currentPage++;
+    } catch (e, st) {
+      log('Error loading products: $e\n$st');
     }
 
     _isLoading = false;
   }
-}
-
-class ProductsQuery {
-  final int categoryId;
-  final String search;
-
-  ProductsQuery({required this.categoryId, this.search = ''});
-
-  ProductsQuery copyWith({int? categoryId, String? search}) {
-    return ProductsQuery(
-      categoryId: categoryId ?? this.categoryId,
-      search: search ?? this.search,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ProductsQuery &&
-          runtimeType == other.runtimeType &&
-          categoryId == other.categoryId &&
-          search == other.search;
-
-  @override
-  int get hashCode => categoryId.hashCode ^ search.hashCode;
 }

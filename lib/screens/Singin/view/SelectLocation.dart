@@ -18,7 +18,7 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
 
   final List<String> zones = ['Banasree', 'Uttara', 'Dhanmondi'];
   final List<String> areas = ['Block A', 'Block B', 'Block C'];
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(

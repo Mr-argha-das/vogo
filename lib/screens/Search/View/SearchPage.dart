@@ -1,9 +1,11 @@
-// search_page.dart
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:vogo/core/network/api.state.dart';
 import 'package:vogo/core/network/http.api.service.dart';
 import 'package:vogo/core/utils/preety.dio.dart';
@@ -36,15 +38,15 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    Future.microtask(() {
       ref.read(productsProvider(widget.categoryId).notifier).clearData();
       ref.read(productsProvider(widget.categoryId).notifier).loadInitial();
-    });
+    }); 
   }
 
   void _scrollListener() {
     if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent) {
+        _scrollController.position.maxScrollExtent - 100) {
       ref.read(productsProvider(widget.categoryId).notifier).loadMore();
     }
   }
@@ -110,17 +112,17 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                         },
                       ),
                     const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => const FilterScreen(),
-                          ),
-                        );
-                      },
-                      child: const Icon(Icons.tune, color: Colors.black),
-                    ),
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       CupertinoPageRoute(
+                    //         builder: (context) => const FilterScreen(),
+                    //       ),
+                    //     );
+                    //   },
+                    //   child: const Icon(Icons.tune, color: Colors.black),
+                    // ),
                   ],
                 ),
               ),
@@ -130,46 +132,43 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   onRefresh: () async {
                     notifier.loadInitial();
                   },
-                  child:
-                      products.isEmpty
-                          ? const Center(child: CircularProgressIndicator())
-                          : GridView.builder(
-                            controller: _scrollController,
-                            itemCount: products.length + 1,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  childAspectRatio: 0.7,
-                                  crossAxisSpacing: 12,
-                                  mainAxisSpacing: 16,
-                                ),
-                            itemBuilder: (context, index) {
-                              if (index >= products.length) {
-                                return const Center(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(16.0),
-                                    child: CircularProgressIndicator(),
+                  child: products == null || products.data.isEmpty
+                      ? Center(
+                          child: LoadingAnimationWidget.flickr(
+                              leftDotColor: Colors.green.shade700,
+                              rightDotColor: Colors.blue,
+                              size: 40),
+                        )
+                      : GridView.builder(
+                          controller: _scrollController,
+                          itemCount: products.data.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.7,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 16,
+                          ),
+                          itemBuilder: (context, index) {
+                            log("Product index: $index");
+
+                            final product = products.data[index];
+
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => ProductDetailScreen(
+                                      productId: product.id.toString(),
+                                    ),
                                   ),
                                 );
-                              }
-                              final product = products[index];
-
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    CupertinoPageRoute(
-                                      builder:
-                                          (context) => ProductDetailScreen(
-                                            productId: product.id.toString(),
-                                          ),
-                                    ),
-                                  );
-                                },
-                                child: ProductCard(product: product),
-                              );
-                            },
-                          ),
+                              },
+                              child: ProductCard(product: product),
+                            );
+                          },
+                        ),
                 ),
               ),
             ],
@@ -181,7 +180,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 }
 
 class ProductCard extends StatefulWidget {
-  final model.ProductsByCategoryModel product;
+  final model.Datum product;
   const ProductCard({super.key, required this.product});
 
   @override
@@ -189,7 +188,8 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  bool cartisLoding = false;
+  bool cartIsLoading = false;
+
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
@@ -212,30 +212,12 @@ class _ProductCardState extends State<ProductCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            // child: Center(
-            //   child:
-            //       product.images!.isNotEmpty
-            //           ? Image.network(
-            //             product.images?.first.src ?? "",
-            //             fit: BoxFit.contain,
-            //             errorBuilder: (context, error, stack) {
-            //               return const Icon(
-            //                 Icons.image_not_supported,
-            //                 color: Colors.grey,
-            //               );
-            //             },
-            //           )
-            //           : const Icon(
-            //             Icons.image_not_supported,
-            //             color: Colors.grey,
-            //           ),
-            // ),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
                 image: DecorationImage(
                   image: NetworkImage(
-                    product.images?.first.src ?? "",
+                    product.image ?? "",
                   ),
                   fit: BoxFit.fill,
                 ),
@@ -249,11 +231,6 @@ class _ProductCardState extends State<ProductCard> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          if (product.weight != null && product.weight!.isNotEmpty)
-            Text(
-              product.weight!,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
           const SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -267,9 +244,8 @@ class _ProductCardState extends State<ProductCard> {
               ),
               GestureDetector(
                 onTap: () async {
-                  // Add to cart logic
                   setState(() {
-                    cartisLoding = true;
+                    cartIsLoading = true;
                   });
                   final box = await Hive.openBox('userdata');
                   final id = box.get('@id');
@@ -282,39 +258,24 @@ class _ProductCardState extends State<ProductCard> {
                       quantity: 1,
                     ),
                   );
+
                   Fluttertoast.showToast(
                     msg: "${response.response.data["message"]}",
                     textColor: Colors.white,
-                    backgroundColor: Color(0xFF0D5C3E),
-
+                    backgroundColor: const Color(0xFF0D5C3E),
                     toastLength: Toast.LENGTH_LONG,
                     gravity: ToastGravity.TOP,
                   );
-                  if(response.response.data['status'] != false){
-                    Navigator.push(context, CupertinoPageRoute(builder: (context) => CartScreen()));
+
+                  if (response.response.data['status'] != false) {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(builder: (context) => CartScreen()),
+                    );
                   }
-                  // setState(() {
-                  //   cartisLoding = false;
-                  // });
-                  // if (response
-                  //         .response
-                  //         .statusCode ==
-                  //     200) {
 
-                  // } else {
-                  //   Fluttertoast.showToast(
-                  //     msg: "Failed to add product to cart",
-                  //     textColor: Colors.white,
-                  //     backgroundColor: Colors.red,
-
-                  //     toastLength:
-                  //         Toast.LENGTH_LONG,
-                  //     gravity: ToastGravity.TOP,
-                  //   );
-
-                  // }
                   setState(() {
-                    cartisLoding = false;
+                    cartIsLoading = false;
                   });
                 },
                 child: Container(
@@ -323,13 +284,12 @@ class _ProductCardState extends State<ProductCard> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(6),
-                  child:
-                      cartisLoding == false
-                          ? Icon(Icons.add, color: Colors.white, size: 20)
-                          : CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
+                  child: cartIsLoading == false
+                      ? const Icon(Icons.add, color: Colors.white, size: 20)
+                      : const CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
                 ),
               ),
             ],

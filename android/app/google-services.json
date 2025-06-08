@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "794351359889",
+    "project_id": "vogo-testing",
+    "storage_bucket": "vogo-testing.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:794351359889:android:6fc454d4116c13ce32ac30",
+        "android_client_info": {
+          "package_name": "com.example.vogo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB67pFF1Lu4eFu3XCkHJBKQucqcnoOaPmo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
